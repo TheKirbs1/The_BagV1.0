@@ -45,6 +45,6 @@ class Invoice(db.Model):
 #       update layout.js as well
 # 2. create the necessary inputs needed for signup and login.js
 # 3. make sure that they are controlled inputs (useState)
-# 4. include useContext and Contex5t for flux applications
+# 4. include useContext and Context for flux applications
 # 5. update flux.js to have token, message, invoices in the store
 # 6. update and test the actions to be ablwe to retrieve a token and save it in localStorage
