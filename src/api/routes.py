@@ -41,7 +41,7 @@ def generate_token():
     response = {
         "access_token": access_token,
         "user_id": user.id,
-        "msg": f'Welcome {user.email}! This worked!'
+        "msg": f'Welcome {user.email}!'
     }
 
     return jsonify(response), 200
@@ -105,3 +105,12 @@ def get_invoices():
     }
     
     return jsonify(response), 200
+
+    # work on the front end
+# 1. create 3 new pages: /Signup, /Login, /Private 
+#       update layout.js as well
+# 2. create the necessary inputs needed for signup and login.js
+# 3. make sure that they are controlled inputs (useState)
+# 4. include useContext and Context for flux applications
+# 5. update flux.js to have token, message, invoices in the store
+# 6. update and test the actions to be ablwe to retrieve a token and save it in localStorage

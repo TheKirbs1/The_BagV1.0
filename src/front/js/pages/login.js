@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Context } from "../store/appContext";
 import "../../styles/home.css";
 import { useNavigate, Link } from "react-router-dom";
@@ -10,44 +10,56 @@ export const Login = () => {
 	const [password, setPassword] = useState("");
 	let token = sessionStorage.getItem("token");
 	 const handleClick = () => {
-		actions.login(email, password).then( () => {
-			navigate('/');
-		} )
+		actions.login(email, password)
 	 }
 
-	return (
-		<div className="text-center mt-5">
-			{token && token !== "" && token !== undefined ?
-				<>
-					<h1>User logged in</h1>
-				</>
-			:
-			<>
-			<h1>Login</h1>
-			<div>
-				<input 
-					type="text" 
-					placeholder="email"
-					value={email}
-					onChange={(e) => setEmail(e.target.value)}
-				/>
-			</div>
-			<div>
-				<input 
-					type="password" 
-					placeholder="password"
-					value={password}
-					onChange={(e) => setPassword(e.target.value)} 
-				/>
-			</div>
-			<div>
-				<button className="btn btn-primary" onClick={handleClick}>Login</button>
-			</div>
-            <div>
-				<button className="btn btn-info" onClick={handleClick}>New User Signup</button>
-			</div>
-			</>
-			}			
-		</div>
-	);
-};
+	 useEffect (() => {
+        if(store.isLoginSuccessful) {
+            navigate("/login")
+        }
+    }, [store.isLoginSuccessful])
+
+
+	 return(
+        <div className="login-page">
+            {store.token && store.token !== "" && store.token !== undefined ? (
+            <>
+                <h1>You are logged in</h1>
+                <Link to="/private">
+                    <button>Go to your invoices</button>
+                </Link>
+            </>
+            ) : (
+            <>
+                <div>
+                    <h1>Login</h1>
+                </div>
+                <div>{store.loginMessage || ""}</div>
+                <div>
+                    <input
+                        type="email"
+                        placeholder="Enter email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                    <input
+                        type="password"
+                        placeholder="Enter password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <button onClick={handleClick}>Login</button>
+                </div>
+                <div>
+                    <Link to="/signup" className="btn btn-info">
+                        New User
+                    </Link>
+                </div>
+            </>
+            )}
+        </div>
+    )}

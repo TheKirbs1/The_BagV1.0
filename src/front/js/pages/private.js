@@ -6,5 +6,5 @@ export const Private = () => {
 
     return (
         <>private page for invoices</>
-    )
+    );
 }
