@@ -1,0 +1,42 @@
+body {
+    margin: 0;
+    font-family: 'Times New Roman', Times, serif;
+    background: #0c0c0c;
+}
+
+.private-page {
+    margin: 10px;
+    font-family: 'Times New Roman', Times, serif;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #ce0505;
+    font-family:'Times New Roman', Times, serif;
+}
+
+.table th {
+    background-color: #4b4b4b;
+    color: rgb(255, 255, 255);
+    font-weight: bold;
+    padding: 15px;
+    text-align: center;
+}
+
+.table tr:hover {
+    background-color: #c9df03;
+}
+
+.table-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.table {
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+    background-color: #fff;
+}

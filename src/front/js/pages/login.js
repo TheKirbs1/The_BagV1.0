@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { Context } from "../store/appContext";
 import "../../styles/home.css";
 import { useNavigate, Link } from "react-router-dom";
+import '../../styles/login.css'
 
 export const Login = () => {
 	const navigate = useNavigate();
@@ -31,11 +32,11 @@ export const Login = () => {
             </>
             ) : (
             <>
-                <div>
+                <div className="title">
                     <h1>Login</h1>
                 </div>
                 <div>{store.loginMessage || ""}</div>
-                <div>
+                <div classname="inputs">
                     <input
                         type="email"
                         placeholder="Enter email"
