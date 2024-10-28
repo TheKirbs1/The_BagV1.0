@@ -8,17 +8,17 @@ export const Private = () => {
     const [authStatus, setAuthStatus] = useState("Pending");
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const authenticate = async () => {
-            let result = await actions.getInvoices();
-            if (result) {
-                setAuthStatus("approved");
-            } else {
-                setAuthStatus("denied");
-            }
-        }
-        authenticate();
-    }, [actions]);
+    // useEffect(() => {
+    //     const authenticate = async () => {
+    //         let result = await actions.getInvoices();
+    //         if (result) {
+    //             setAuthStatus("approved");
+    //         } else {
+    //             setAuthStatus("denied");
+    //         }
+    //     }
+    //     authenticate();
+    // }, [actions]);
 
     return (
         <div className="private-page">
@@ -40,7 +40,7 @@ export const Private = () => {
                                 <th scope="col">Invoice Date</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        {/* <tbody>
                             {store.invoices.map((invoice, index) => (
                                 <tr key={index}>
                                     <th scope="row">{invoice.invoice_number}</th>
@@ -48,7 +48,7 @@ export const Private = () => {
                                     <td>{invoice.invoice_date}</td>
                                 </tr>
                             ))}
-                        </tbody>
+                        </tbody> */}
                     </table>
                 </div>
             ) : (

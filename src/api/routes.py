@@ -1,43 +1,44 @@
+
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Invoice
+from api.models import db, User 
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
+import json
+from datetime import timedelta
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import jwt_required
+
+# import cloudinary.uploader as uploader
+# from cloudinary.uploader import destroy
+# from cloudinary.api import delete_resources_by_tag
 
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
 CORS(api)
 
-# /token POST
-# this route is for when the user ALREADY exists and needs an access token
-# create a user query with a conditional to see if the user exists, or return None
-# test on Postman 
 
 @api.route('/token', methods=['POST'])
 def generate_token():
 
-    #recieving the request and converting the body of the request into json format
     email = request.json.get("email", None)
-    password = request.json.get("password", None)
+    password = request.json.get("pasword", None)
 
-    # Query your database for email and password
+    # quey the User table to check ir the user exists
     email = email.lower()
     user = User.query.filter_by(email=email, password=password).first()
 
     if user is None:
         response = {
-            "msg": "Email or Password does not match"
+            "msg": "Email or Password does not match."
         }
         return jsonify(response), 401
-
-    access_token = create_access_token(identity=user.id)
+    
+    expires = timedelta(minutes=15)
+    access_token = create_access_token(identity=user.id, expires_delta=expires)
     response = {
         "access_token": access_token,
         "user_id": user.id,
@@ -45,72 +46,140 @@ def generate_token():
     }
 
     return jsonify(response), 200
+def editUserSettings(email, password):
+    user_id = get_jwt_identity()
+    user = User.query.filter_by(id=user_id).first()
+
+    if user is None:
+        return {'msg': 'User NOT found'}, True
+
+    user.email = email
+    user.password = password
+    db.session.commit()
+
+    return {'msg': 'Congratulations, You have successfully changed your Account Settings!'}, False
+
+def deactivateOrReactivateAccount(is_active):
+    user_id = get_jwt_identity()
+    user = User.query.filter_by(id=user_id).first()
+
+    if user is None:
+        return {'msg': 'User NOT found'}, True
+
+    user.is_active = is_active
+    db.session.commit()
+
+    if is_active:
+        return {'msg': 'Congratulations, You have successfully activated your Account'}, False
+    else:
+        return {'msg': 'Congratulations, You have successfully deactivated your Account'}, False
+
+@api.route('/edit-user', methods=['PUT'])
+@jwt_required()
+def edit_user():
+    user_id = get_jwt_identity()
+    email = request.json.get('email', None)
+    password = request.json.get('password', None)
+    email = email.lower()
+    user = User.query.filter_by(id=user_id).first()
+
+    if user is None:
+        response = {
+            'msg': 'User NOT found'
+        }
+        return jsonify(response), 404
+
+    user.email = email
+    user.password = password
+    db.session.commit()
+
+    response = {
+        'msg': 'Congratulations, You have successfully changed your Account Settings!'
+    }
+    return jsonify(response), 200
+
+@api.route('/deactivate-account', methods=['PUT'])
+@jwt_required()
+def deactivate_account():
+    user_id = get_jwt_identity()
+    is_active = request.json.get("is_active", None)
+    user = User.query.filter_by(id=user_id).first()
+
+    if user is None:
+        response = {
+            'msg': 'User NOT found'
+        }
+        return jsonify(response), 404
+
+    msg, error = deactivateOrReactivateAccount(is_active)
+    if error:
+        return jsonify({'msg': msg}), 404
+    else:
+        return jsonify({'msg': msg}), 200
+
 
 @api.route('/signup', methods=['POST'])
 def register_user():
-    email = request.json.get("email", None)
-    password = request.json.get("password", None)
+    email = request.json.get('email', None)
+    password = request.json.get('password', None)
 
-    #query to check if email already exists
     email = email.lower()
     user = User.query.filter_by(email=email).first()
 
-    if user is not None and user.email == email:
-        response = {
-            'msg': 'User already exists.'
+    if user:
+        response ={
+            'msg' : 'User already exist'
         }
-
+        
         return jsonify(response), 403
-    
-    #if the email doees NOT exist, go ahead and make a new recond in the Database 
-    #sign this person up
-    user= User()
+
+    user = User()
     user.email = email
     user.password = password
     user.is_active = True
     db.session.add(user)
     db.session.commit()
 
-    response = {
-        'msg': f'Congrats {user.email}. You have successfully signed up!'
-    } 
-
-    return jsonify(response), 200
-
-
-@api.route('/invoices', methods=['GET'])
-@jwt_required()
-def get_invoices():
-    #retrieve the user_id of the current user from the access_token
-    #you do that with get_jwt_identity
-
-    user_id = get_jwt_identity()
-
-    user = User.query.filter_by(id= user_id).first()
-    #query and retrieve any invoices that are in the Database
-    user_invoices = Invoice.query.filter_by(user_id=user_id).all()
-
-    # print("user_invoices: ", user_invoices)
-
-# use a list comprehension(for loop) that will:
-# 1. Get each Invoice object and serialize it
-# 2. Put them in the processed_invoices array
-    processed_invoices = [each_invoice.serialize() for each_invoice in user_invoices]
-
-    # print("processed invoices: ", processed_invoices)
-
-    response = {
-        'msg': f'Hello {user.email}, here are your invoices.', 
-        'invoices': processed_invoices
+    response ={
+        'msg' : f'Congratulations, You have sussefully signed up!'
     }
-    
     return jsonify(response), 200
 
-    # work on the front end
-# 1. create 3 new pages: /Signup, /Login, /Private 
-#       update layout.js as well
-# 2. create the necessary inputs needed for signup and login.js
-# 3. make sure that they are controlled inputs (useState)
-# 4. include useContext and Context for flux applications
-# 5. update flux.js to have token, message, invoices in the store
-# 6. update and test the actions to be ablwe to retrieve a token and save it in localStorage
+@api.route('/login', methods=['POST'])
+def login():
+    email = request.json.get('email', None)
+    password = request.json.get('password', None)
+
+    email = email.lower()
+    user = User.query.filter_by(email=email).first()
+
+    if user is None:
+        response ={
+            'msg' : 'User does not exist'
+        }
+        
+        return jsonify(response), 404
+    
+    if user.password != password:
+        response ={
+            'msg' : 'Incorrect Password'
+        }
+         
+        return jsonify(response), 401
+    
+    access_token=create_access_token(identity=user.id)
+    response ={
+        'msg' : f'Congratulations, You have sussefully Logged In!',
+        "token":access_token
+    }
+    return jsonify(response), 200
+
+@api.route('/private', methods=['GET'])
+@jwt_required()
+def get_user():
+    user_id = get_jwt_identity()
+    current_user = User.query.get(user_id)
+    if current_user is None: 
+        return jsonify({"msg": "User not found"}), 404
+    
+    return jsonify({"msg": "Here is your profile info", "user" : current_user.serialize()}), 200
