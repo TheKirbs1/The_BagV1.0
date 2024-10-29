@@ -6,8 +6,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			isSignUpSuccessful: false,
 			isLoginSuccessful: false,
 			loginMessage: null,
-			invoiceMessage: null,
-			invoices: []
+			discs: []
 			},
 		actions: {
 
@@ -54,9 +53,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 					signupMessage: null,
 					isSignUpSuccessful: false,
 					isLoginSuccessful: false,
-					loginMessage: null,
-					invoiceMessage: null,
-					invoices: []
+					loginMessage: null,					
+					discs: []
 				})
 				// console.log("You've logged out")
 			},
@@ -94,38 +92,37 @@ const getState = ({ getStore, getActions, setStore }) => {
 				return data;
 			},
 			
-			getInvoices: async() => {
-					const store= getStore()
+			// getInvoices: async() => {
+			// 		const store= getStore()
 					
-					const options = {
-						method: 'GET',
-						mode: 'cors',
-						headers: {
-							'Content-Type': 'application/json',
-							'Authorization': `Bearer ${store.token}`
-						},
-					}
-					const response = await fetch(`${process.env.BACKEND_URL}api/invoices`, options)
+			// 		const options = {
+			// 			method: 'GET',
+			// 			mode: 'cors',
+			// 			headers: {
+			// 				'Content-Type': 'application/json',
+			// 				'Authorization': `Bearer ${store.token}`
+			// 			},
+			// 		}
+			// 		const response = await fetch(`${process.env.BACKEND_URL}api/invoices`, options)
 	
-					if (!response.ok) {
-						return{
-							error: {
-								status: response.status,
-								statusText: response.statusText
-							}
-						}
-					}
+			// 		if (!response.ok) {
+			// 			return{
+			// 				error: {
+			// 					status: response.status,
+			// 					statusText: response.statusText
+			// 				}
+			// 			}
+			// 		}
 	
-					const data = await response.json()
-					setStore({
-						invoices: data.invoices,
-						invoiceMessage: data.msg
-					})
-					// console.log(data.msg, data.invoices)
-					return data;
+			// 		const data = await response.json()
+			// 		setStore({
+			// 			invoices: data.invoices,
+			// 			invoiceMessage: data.msg
+			// 		})
+			// 		// console.log(data.msg, data.invoices)
+			// 		return data;
 			}
 		}
 	};
-};
 
 export default getState;
