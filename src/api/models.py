@@ -23,8 +23,6 @@ class User(db.Model):
             # do not serialize the password, it's a security breach
         }
 
-
-
 class Disc(db.Model):
     __tablename__ = "disc_table"
     id = db.Column(db.Integer, primary_key=True)
